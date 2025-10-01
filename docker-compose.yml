@@ -7,6 +7,10 @@ services:
       - ./_PHP_FPM/php-fpm.conf:/usr/local/etc/php-fpm.conf
       - ./_PHP_FPM/www.conf:/usr/local/etc/php-fpm.d/www.conf
       - ./_PHP_FPM/Logs:/var/log/php
+    links:
+      - db
+    depends_on:
+      - db
   nginx:
     build: _NGINX
     restart: always
