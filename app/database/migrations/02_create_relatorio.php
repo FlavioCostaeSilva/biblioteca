@@ -8,7 +8,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement("
-            CREATE VIEW RelatorioPorAutor AS
+            CREATE OR REPLACE VIEW RelatorioPorAutor AS
             SELECT
                 A.CodAu,
                 A.Nome AS AutorNome,
