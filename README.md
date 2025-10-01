@@ -17,3 +17,4 @@ This is a job test, build with PHP (v8.4) and Laravel
 10. Run command "**cp .env.example .env**", to prepare config file
 11. Run command "**php artisan key:generate**", to gen a Laravel unique key
 12. Run command "**php artisan migrate**", to run database migrations
+13. Go to URL [localhost:8081](http://localhost:8081)
