@@ -8,9 +8,9 @@ This is a job test, build with PHP (v8.4) and Laravel
 1. Install Docker and Docker Compose in your machine
 2. Clone this project
 3. Go to project root folder
-4. Run command "**docker-compose build**"
-5. Run command "**docker-compose up -d**"
-6. After finish, run command "**docker-compose ps**"
+4. Run command "**docker compose build**"
+5. Run command "**docker compose up -d**"
+6. After finish, run command "**docker compose ps**"
 7. Find the name from php-fpm container
 8. Run the command "**docker exec -it <PHP_CONTAINER_NAME> /bin/bash**"
 9. Now, inside the container, run the command: "**composer install --optimize-autoloader**"
