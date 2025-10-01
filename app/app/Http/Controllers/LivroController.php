@@ -2,90 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Livro;
-use App\Models\Autor;
-use App\Models\Assunto;
+use App\Services\LivroServiceInterface;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class LivroController extends Controller
 {
-    public function index()
+    protected LivroServiceInterface $service;
+
+    public function __construct(LivroServiceInterface $service)
     {
-        $livros = Livro::all();
+        $this->service = $service;
+    }
+
+    public function index(): Factory|View|Application
+    {
+        $livros = $this->service->getAllLivros();
         return view('livros.index', compact('livros'));
     }
 
-    public function create()
+    public function create(): Factory|View|Application
     {
-        $autores = Autor::all();
-        $assuntos = Assunto::all();
-        return view('livros.create', compact('autores', 'assuntos'));
+        $data = $this->service->getAutoresAndAssuntos();
+        return view('livros.create', $data);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'Titulo' => 'required|string|max:40',
-            'Editora' => 'required|string|max:40',
-            'AnoPublicacao' => 'required|string|size:4',
-            'Preco' => 'required|integer',
-            'autores' => 'array',
-            'assuntos' => 'array',
-        ]);
-
-        $livro = Livro::create($validated);
-
-        if (isset($validated['autores'])) {
-            $livro->autores()->attach($validated['autores']);
-        }
-
-        if (isset($validated['assuntos'])) {
-            $livro->assuntos()->attach($validated['assuntos']);
-        }
-
-        return redirect()
-            ->route('livros.index')
-            ->with('success', 'Livro criado com sucesso!');
+        $this->service->createLivro($request->all());
+        return redirect()->route('livros.index')->with('success', 'Livro criado com sucesso!');
     }
 
-    public function show(Livro $livro)
+    public function show($id): Factory|View|Application
     {
+        $livro = $this->service->getLivroById($id);
         return view('livros.show', compact('livro'));
     }
 
-    public function edit(Livro $livro)
+    public function edit($id): Factory|View|Application
     {
-        $autores = Autor::all();
-        $assuntos = Assunto::all();
-        return view('livros.edit', compact('livro', 'autores', 'assuntos'));
+        $livro = $this->service->getLivroById($id);
+        $data = $this->service->getAutoresAndAssuntos();
+        return view('livros.edit', array_merge(compact('livro'), $data));
     }
 
-    public function update(Request $request, Livro $livro)
+    public function update(Request $request, $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'Titulo' => 'required|string|max:40',
-            'Editora' => 'required|string|max:40',
-            'AnoPublicacao' => 'required|string|size:4',
-            'Preco' => 'required|integer',
-            'autores' => 'array',
-            'assuntos' => 'array',
-        ]);
-
-        $livro->update($validated);
-
-        $livro->autores()->sync($validated['autores'] ?? []);
-        $livro->assuntos()->sync($validated['assuntos'] ?? []);
-
-        return redirect()
-            ->route('livros.index')
-            ->with('success', 'Livro atualizado com sucesso!');
+        $this->service->updateLivro($id, $request->all());
+        return redirect()->route('livros.index')->with('success', 'Livro atualizado com sucesso!');
     }
 
-    public function destroy(Livro $livro)
+    public function destroy($id): RedirectResponse
     {
-        $livro->delete();
-        return redirect()
-            ->route('livros.index')
-            ->with('success', 'Livro excluído com sucesso!');
+        $this->service->deleteLivro($id);
+        return redirect()->route('livros.index')->with('success', 'Livro excluído com sucesso!');
     }
 }
