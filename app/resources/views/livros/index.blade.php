@@ -31,7 +31,7 @@
                     <td>{{ $livro->Titulo }}</td>
                     <td>{{ $livro->Editora }}</td>
                     <td>{{ $livro->AnoPublicacao }}</td>
-                    <td>{{ $livro->Preco }}</td>
+                    <td>R$ {{ number_format($livro->Preco / 100, 2, ',', '.') }}</td>
                     <td>
                         <a href="{{ route('livros.show', $livro) }}" class="btn btn-info btn-sm">Ver</a>
                         <a href="{{ route('livros.edit', $livro) }}" class="btn btn-warning btn-sm">Editar</a>

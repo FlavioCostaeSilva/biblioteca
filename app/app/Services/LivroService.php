@@ -60,14 +60,20 @@ class LivroService implements LivroServiceInterface
     {
         $anoAtual = now()->year;
 
-        return Validator::make($data, [
+        $validator = Validator::make($data, [
             'Titulo' => 'required|string|max:40',
             'Editora' => 'required|string|max:40',
             'AnoPublicacao' => "required|numeric|digits:4|min:1000|max:{$anoAtual}",
-            'Preco' => 'required|integer',
+            'Preco' => 'required|numeric|min:0',
             'autores' => 'array',
             'assuntos' => 'array',
-        ])->validate();
+        ]);
+
+        $validated = $validator->validate();
+
+        $validated['Preco'] = (int) round($validated['Preco'] * 100);
+
+        return $validated;
     }
 
     private function attachRelations(Livro $livro, array $data)

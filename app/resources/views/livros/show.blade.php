@@ -16,7 +16,7 @@
         <dt class="col-sm-3">Ano de Publicação</dt>
         <dd class="col-sm-9">{{ $livro->AnoPublicacao }}</dd>
         <dt class="col-sm-3">Preço</dt>
-        <dd class="col-sm-9">{{ $livro->Preco }}</dd>
+        <dd class="col-sm-9">R$ {{ number_format($livro->Preco / 100, 2, ',', '.') }}</dd>
         <dt class="col-sm-3">Autores</dt>
         <dd class="col-sm-9">
             @if($livro->autores->isEmpty())
