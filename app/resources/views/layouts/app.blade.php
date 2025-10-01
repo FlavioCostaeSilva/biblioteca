@@ -26,6 +26,10 @@
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-primary mb-2" href="{{ route('autores.index') }}">Gerenciar Autores</a>
                     </li>
+                    <hr>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-primary mb-2" href="{{ route('relatorio.index') }}">Visualizar Relatório</a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -37,5 +41,26 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleciona todos os alerts do Bootstrap presentes na página
+        const alerts = document.querySelectorAll('.alert');
+
+        // Para cada alert, define um timeout de 3 segundos para fechá-lo com fade out
+        alerts.forEach(function(alertElement) {
+            setTimeout(function() {
+                // Adiciona transição de opacidade para efeito de esmaecimento
+                alertElement.style.transition = 'opacity 0.5s ease-in-out';
+                alertElement.style.opacity = 0;
+
+                // Remove o elemento após a transição (500ms)
+                setTimeout(function() {
+                    alertElement.remove();
+                }, 1000);
+            }, 4000);
+        });
+    });
+</script>
 </body>
 </html>
