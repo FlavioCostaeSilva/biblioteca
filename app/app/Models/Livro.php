@@ -17,7 +17,7 @@ class Livro extends Authenticatable
 
     public function autores()
     {
-        return $this->belongsToMany(Livro::class, 'Livro_Autor', 'Livro_Codl', 'Autor_CodAu');
+        return $this->belongsToMany(Autor::class, 'Livro_Autor', 'Livro_Codl', 'Autor_CodAu');
     }
 
     public function assuntos()

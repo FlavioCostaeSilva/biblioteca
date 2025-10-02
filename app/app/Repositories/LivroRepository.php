@@ -14,7 +14,8 @@ class LivroRepository implements LivroRepositoryInterface
 
     public function find($id)
     {
-        return Livro::findOrFail($id);
+        return Livro::with(['autores', 'assuntos'])
+            ->findOrFail($id);
     }
 
     public function create(array $data)
