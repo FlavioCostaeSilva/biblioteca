@@ -23,7 +23,7 @@ class LivroRepository implements LivroRepositoryInterface
         return Livro::create($data);
     }
 
-    public function update(Livro $livro, array $data)
+    public function update(Livro $livro, array $data): Livro
     {
         $livro->update($data);
         return $livro;

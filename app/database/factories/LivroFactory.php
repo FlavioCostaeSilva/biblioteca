@@ -15,10 +15,10 @@ class LivroFactory extends Factory
     public function definition(): array
     {
         return [
-            'Titulo' => $this->faker->sentence(3),
-            'Editora' => $this->faker->company,
+            'Titulo' => substr($this->faker->sentence(3), 0, 40),
+            'Editora' => substr($this->faker->company, 0, 40),
             'AnoPublicacao' => $this->faker->year,
-            'Preco' => $this->faker->numberBetween(10, 100),
+            'Preco' => $this->faker->numberBetween(10, 1000),
         ];
     }
 }

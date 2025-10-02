@@ -54,34 +54,4 @@
         </div>
         <button type="submit" class="btn btn-primary">Atualizar</button>
     </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const precoInput = document.getElementById('Preco');
-
-            // Formata o valor inicial se necessário
-            precoInput.value = 'R$ ' + precoInput.value;
-
-            function formatMoney(value) {
-                value = value.replace(/\D/g, '');
-                value = (value / 100).toFixed(2) + '';
-                value = value.replace('.', ',');
-                value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                return 'R$ ' + value;
-            }
-
-            precoInput.addEventListener('input', function(e) {
-                let value = e.target.value;
-                value = value.replace(/[^\d]/g, '');
-                e.target.value = formatMoney(value);
-            });
-
-            // Para submissão, converte de volta para decimal (ex: 10,00 -> 10.00)
-            const form = precoInput.closest('form');
-            form.addEventListener('submit', function() {
-                let value = precoInput.value.replace(/R\$ /g, '').replace(/\./g, '').replace(',', '.');
-                precoInput.value = parseFloat(value).toFixed(2);
-            });
-        });
-    </script>
 @endsection

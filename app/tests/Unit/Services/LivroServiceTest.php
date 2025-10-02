@@ -5,90 +5,80 @@ namespace Tests\Unit\Services;
 use App\Models\Assunto;
 use App\Models\Autor;
 use App\Models\Livro;
-use App\Repositories\LivroRepositoryInterface;
+use App\Repositories\LivroRepository;
 use App\Services\LivroService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
-use Mockery;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 class LivroServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected MockInterface $repositoryMock;
     protected LivroService $service;
+    protected LivroRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repositoryMock = Mockery::mock(LivroRepositoryInterface::class);
-        $this->service = new LivroService($this->repositoryMock);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        $this->repository = new LivroRepository();
+        $this->service = new LivroService($this->repository);
     }
 
     public function testGetAllLivros(): void
     {
-        $livros = collect([new Livro(), new Livro()]);
-        $this->repositoryMock->shouldReceive('all')
-            ->once()
-            ->andReturn($livros);
+        Livro::factory()->count(2)->create();
 
         $result = $this->service->getAllLivros();
 
-        $this->assertEquals($livros, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(Livro::class, $result[0]);
     }
 
     public function testGetLivroById(): void
     {
-        $id = 1;
-        $livro = new Livro();
-        $this->repositoryMock->shouldReceive('find')
-            ->with($id)
-            ->once()
-            ->andReturn($livro);
+        $autor1 = Autor::factory()->create();
+        $autor2 = Autor::factory()->create();
+        $assunto1 = Assunto::factory()->create();
+        $assunto2 = Assunto::factory()->create();
 
-        $result = $this->service->getLivroById($id);
+        $livro = Livro::factory()->create();
+        $livro->autores()->attach([$autor1->CodAu, $autor2->CodAu]);
+        $livro->assuntos()->attach([$assunto1->codAs, $assunto2->codAs]);
 
-        $this->assertEquals($livro, $result);
+        $result = $this->service->getLivroById($livro->Codl);
+
+        $this->assertEquals($livro->Codl, $result->Codl);
+        $this->assertTrue($result->relationLoaded('autores'));
+        $this->assertTrue($result->relationLoaded('assuntos'));
+        $this->assertCount(2, $result->autores);
+        $this->assertCount(2, $result->assuntos);
     }
 
     public function testCreateLivroSuccess(): void
     {
+        $autor1 = Autor::factory()->create();
+        $autor2 = Autor::factory()->create();
+        $assunto1 = Assunto::factory()->create();
+        $assunto2 = Assunto::factory()->create();
+
         $data = [
             'Titulo' => 'Test Title',
             'Editora' => 'Test Editora',
             'AnoPublicacao' => '2020',
-            'Preco' => 10,
-            'autores' => [1, 2],
-            'assuntos' => [3, 4],
+            'Preco' => 1000,
+            'autores' => [$autor1->CodAu, $autor2->CodAu],
+            'assuntos' => [$assunto1->codAs, $assunto2->codAs],
         ];
-
-        $livroMock = Mockery::mock(Livro::class)->makePartial();
-
-        $livroMock->shouldReceive('autores->attach')
-            ->with($data['autores'])
-            ->once();
-
-        $livroMock->shouldReceive('assuntos->attach')
-            ->with($data['assuntos'])
-            ->once();
-
-        $this->repositoryMock->shouldReceive('create')
-            ->with($data)
-            ->once()
-            ->andReturn($livroMock);
 
         $result = $this->service->createLivro($data);
 
-        $this->assertEquals($livroMock, $result);
+        $this->assertEquals($data['Titulo'], $result->Titulo);
+        $this->assertEquals($data['Preco'], $result->Preco);
+        $this->assertDatabaseHas('Livro', ['Titulo' => 'Test Title']);
+        $this->assertCount(2, $result->autores);
+        $this->assertCount(2, $result->assuntos);
     }
 
     public function testCreateLivroValidationFails(): void
@@ -121,43 +111,34 @@ class LivroServiceTest extends TestCase
 
     public function testUpdateLivroSuccess(): void
     {
-        $id = 1;
+        $autor1 = Autor::factory()->create();
+        $assunto1 = Assunto::factory()->create();
+        $livro = Livro::factory()->create();
+
         $data = [
             'Titulo' => 'Updated Title',
             'Editora' => 'Updated Editora',
             'AnoPublicacao' => '2021',
-            'Preco' => 15,
-            'autores' => [1],
-            'assuntos' => [2],
+            'Preco' => 1500,
+            'autores' => [$autor1->CodAu],
+            'assuntos' => [$assunto1->codAs],
         ];
 
-        $livroMock = Mockery::mock(Livro::class)->makePartial();
-        $this->repositoryMock->shouldReceive('find')
-            ->with($id)
-            ->once()
-            ->andReturn($livroMock);
+        $this->service->updateLivro($livro->Codl, $data);
 
-        $this->repositoryMock->shouldReceive('update')
-            ->with($livroMock, $data)
-            ->once()
-            ->andReturn($livroMock);
+        $result = $this->service->getLivroById($livro->Codl);
 
-        $livroMock->shouldReceive('autores->sync')
-            ->with($data['autores'])
-            ->once();
-
-        $livroMock->shouldReceive('assuntos->sync')
-            ->with($data['assuntos'])
-            ->once();
-
-        $result = $this->service->updateLivro($id, $data);
-
-        $this->assertEquals($livroMock, $result);
+        $this->assertEquals($data['Titulo'], $result->Titulo);
+        $this->assertEquals($data['Preco'], $result->Preco);
+        $this->assertDatabaseHas('Livro', ['Titulo' => 'Updated Title']);
+        $this->assertCount(1, $result->autores);
+        $this->assertCount(1, $result->assuntos);
     }
 
     public function testUpdateLivroValidationFails(): void
     {
-        $id = 1;
+        $livro = Livro::factory()->create();
+
         $this->expectException(ValidationException::class);
 
         $invalidData = [
@@ -167,34 +148,16 @@ class LivroServiceTest extends TestCase
             'Preco' => 10,
         ];
 
-        $livroMock = Mockery::mock(Livro::class)->makePartial();
-        $this->repositoryMock->shouldReceive('find')
-            ->with($id)
-            ->once()
-            ->andReturn($livroMock);
-
-        $this->service->updateLivro($id, $invalidData);
+        $this->service->updateLivro($livro->Codl, $invalidData);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
     public function testDeleteLivro(): void
     {
-        $id = 1;
-        $livroMock = Mockery::mock(Livro::class)
-            ->makePartial();
+        $livro = Livro::factory()->create();
 
-        $this->repositoryMock->shouldReceive('find')
-            ->with($id)
-            ->once()
-            ->andReturn($livroMock);
+        $this->service->deleteLivro($livro->Codl);
 
-        $this->repositoryMock->shouldReceive('delete')
-            ->with($livroMock)
-            ->once();
-
-        $this->service->deleteLivro($id);
+        $this->assertDatabaseMissing('Livro', ['Codl' => $livro->Codl]);
     }
 
     public function testGetAutoresAndAssuntos(): void

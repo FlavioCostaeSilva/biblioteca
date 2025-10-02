@@ -40,7 +40,10 @@
         </main>
     </div>
 </div>
+
+<script src="/js/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
 <script src="/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="/js/jquery.maskMoney.min.js" crossorigin="anonymous"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -62,5 +65,19 @@
         });
     });
 </script>
+
+<script>
+    $(document).ready(function() {
+        $('#Preco').maskMoney({
+            prefix: 'R$ ',
+            allowNegative: false,
+            thousands: '.',
+            decimal: ',',
+            affixesStay: false,
+            showSymbol: true,
+        });
+    });
+</script>
+
 </body>
 </html>
